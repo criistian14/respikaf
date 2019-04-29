@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 // Widgets Custom
 import 'package:respikaf/widgets/InputText.dart';
+import 'package:respikaf/widgets/InputSelect.dart';
 
 
 
@@ -19,6 +20,25 @@ class Settings extends StatefulWidget
 class _SettingsState extends State<Settings> 
 {
 	String dateInitial = '';
+	List<String> items = [];
+
+
+	@override
+	void initState() { 
+		super.initState();
+
+		this.loadData();	
+	}
+
+	void loadData()
+	{
+		items = [];
+
+		items.add('Cartucho presurizado');
+		items.add('Polvo seco');
+		items.add('Niebla fina');
+	}
+
 
 
 	Future _openPickerDate() async
@@ -73,7 +93,7 @@ class _SettingsState extends State<Settings>
 				),
 
 				SizedBox(height: 28),
-				InputText(label: 'Tipo de inhalador', typeInput: TextInputType.text),
+				InputSelect(items: items, label: 'Tipo de inhalador'),
 
 				SizedBox(height: 30),
 				Text('Recordatorios', style: Theme.of(context).textTheme.display1),
