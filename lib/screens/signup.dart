@@ -7,6 +7,7 @@ import 'package:respikaf/screens/login.dart';
 
 // Widgets Custom
 import 'package:respikaf/widgets/InputText.dart';
+import 'package:respikaf/widgets/InputSelect.dart';
 
 
 
@@ -21,6 +22,24 @@ class SignUp extends StatefulWidget
 class _SignUpState extends State<SignUp> 
 {
 	String name, lastName, email, password, phone, age;
+	List<String> items = [];
+
+
+	@override
+	void initState() { 
+		super.initState();
+
+		this.loadData();	
+	}
+
+
+	void loadData()
+	{
+		items = [];
+
+		items.add('Asma');
+		items.add('Epoc');
+	}
 
 	void setValue(String value)
 	{
@@ -64,13 +83,12 @@ class _SignUpState extends State<SignUp>
 									SizedBox(height: 20),
 									InputText(label: 'Edad', typeInput: TextInputType.number, setValue: setValue),
 
+									SizedBox(height: 20),									
+									InputSelect(items: items, label: 'Tipo de paciente'),
+
 									SizedBox(height: 50),
 									RaisedButton(
-										shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-										padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
 										elevation: 6,
-										textColor: Colors.white,
-										color: Theme.of(context).accentColor,
 										onPressed: () { },
 										child: Text('Crear Cuenta', style: Theme.of(context).textTheme.display1),
 									),

@@ -30,8 +30,15 @@ class _MyAppState extends State<MyApp>
 			primaryColor: Colors.grey[850],
 			accentColor: Colors.lightBlueAccent[400],
 			dialogBackgroundColor: Colors.grey[300],
+			canvasColor: Colors.grey[850],
 			
+			buttonTheme: ButtonThemeData(
+				shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+				padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+				buttonColor: Theme.of(context).accentColor
+			),
 
+			
 			//fontFamily: 'Roboto',
 			textTheme: TextTheme(
 				title: TextStyle(

@@ -120,11 +120,7 @@ class _LoginState extends State<Login>
 
                         SizedBox(height: 50),
                         RaisedButton(
-                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                           padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                            elevation: 6,
-                           textColor: Colors.white,
-                           color: Theme.of(context).accentColor,
                            onPressed: _validateAndSave,
                            child: Text('Ingresar', style: Theme.of(context).textTheme.display1),
                         ),
