@@ -13,3 +13,14 @@ Control de inhaladores hecha con Flutter
 
    <img src="https://github.com/criistian14/respikaf/blob/master/images/Settings.PNG" width="280" height="510" />
 </div>
+
+
+## Generate APP
+
+```
+// 32 Bit
+flutter build apk --release
+
+// 64 Bit
+flutter build apk --release --target-platform=android-arm64
+```

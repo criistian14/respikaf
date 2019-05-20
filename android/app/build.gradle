@@ -25,6 +25,11 @@ apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     compileSdkVersion 28
 
     lintOptions {
@@ -39,6 +44,13 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        // Generate app / 32bits and 64 bits (PDF Reader)
+        /*ndk {
+           // 64 Bits
+           abiFilters "arm64-v8a"
+           // 32 Bits
+           abiFilters "armeabi-v7a"
+        }*/
     }
 
     buildTypes {

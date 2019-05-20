@@ -14,7 +14,7 @@ class Guide extends StatefulWidget
 class _GuideState extends State<Guide> 
 {
 	final _config = PdfViewerConfig(
-		nightMode: true,
+		nightMode: false,
 		// swipeHorizontal: true
 	);
 

@@ -93,7 +93,21 @@ class _SettingsState extends State<Settings>
 				),
 
 				SizedBox(height: 28),
-				InputSelect(items: items, label: 'Tipo de inhalador'),
+				Row(
+					children: <Widget>[
+						Container(
+							width: MediaQuery.of(context).size.width / 2,
+							child: InputSelect(items: items, label: 'Tipo de inhalador'),
+						),
+						
+						SizedBox(width: 10,),
+						Expanded(
+							//width: MediaQuery.of(context).size.width / 3.6,
+							child: InputText(label: 'N. Dosis', typeInput: TextInputType.number),
+						),
+						
+					],
+				),
 
 				SizedBox(height: 30),
 				Text('Recordatorios', style: Theme.of(context).textTheme.display1),
