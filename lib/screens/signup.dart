@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
 
+// Libraries
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+
+
+// Services
+import 'package:respikaf/services/HttpHandler.dart';
+
+
+// Models
+import 'package:respikaf/models/TypePacient.dart';
+
 
 // Screens
 import 'package:respikaf/screens/login.dart';
@@ -21,8 +33,13 @@ class SignUp extends StatefulWidget
 
 class _SignUpState extends State<SignUp> 
 {
-	String name, lastName, email, password, phone, age;
-	List<String> items = [];
+	String name, lastName, phone, email, password, typePacient;
+	int age;
+	List<DropdownMenuItem<dynamic>> items = [];
+	final formKey = GlobalKey<FormState>();
+   final _scaffoldKey = GlobalKey<ScaffoldState>();
+   bool _isLoading = false;
+
 
 
 	@override
@@ -37,20 +54,129 @@ class _SignUpState extends State<SignUp>
 	{
 		items = [];
 
-		items.add('Asma');
-		items.add('Epoc');
+		items.add(DropdownMenuItem(
+			child: Text('Asma'),
+			value: 'Asma',
+		));
+
+		items.add(DropdownMenuItem(
+			child: Text('Epoc'),
+			value: 'Epoc',
+		));		
 	}
 
-	void setValue(String value)
+	void setValueName(String value)
 	{
 		setState(() {
-         value = value;
+         name = value;
       });
 	}
+	void setValueLastName(String value)
+	{
+		setState(() {
+         lastName = value;
+      });
+	}
+	void setValuePhone(String value)
+	{
+		setState(() {
+         phone = value;
+      });
+	}
+	void setValueEmail(String value)
+	{
+		setState(() {
+         email = value;
+      });
+	}
+	void setValuePassword(String value)
+	{
+		setState(() {
+         password = value;
+      });
+	}
+	void setValueAge(String value)
+	{
+		setState(() {
+         typePacient = value;
+      });
+	}		
+	void setValueTypePacient(dynamic value)
+	{
+		setState(() {
+         typePacient = value;
+      });
+	}	
+	
 
 
-	@override
-	Widget build(BuildContext context) 
+
+   void _validateAndSave() async
+   {
+      final form = formKey.currentState;
+      if (form.validate()) {
+
+         setState(() {
+            _isLoading = true;
+         });
+
+         form.save();
+
+			Map data = {
+				"name": "this.name",
+				"lastName": "this.lastName",
+				"email": "this.email",
+				"password": "this.password",
+				"age": "this.age",
+				"phone": "this.phone",
+				"typePacient": "this.typePacient"
+			};
+
+			print(data);
+			
+			var response = await HttpHandler().post('/user/create', data);
+
+
+		
+			setState(() {
+				_isLoading = false;
+			});	
+
+
+			/*
+         new Future.delayed(Duration(seconds: 2), () async {
+
+            setState(() {
+               _isLoading = false;
+            });
+
+
+            /*
+            _scaffoldKey.currentState.showSnackBar(SnackBar(
+               content: Text('No coinciden los datos'),
+               duration: Duration(seconds: 3),
+               backgroundColor: Colors.red[800]
+            ));
+            */
+
+            final prefs = await SharedPreferences.getInstance();
+
+            prefs.setString('token', email);
+
+            Navigator.of(context).pushReplacementNamed(Login().tag);
+
+         });
+			*/
+         
+
+      } else {
+         print('Form is invalid');
+      }
+   }	
+
+
+
+	Widget _buidlWidget(BuildContext context) 
 	{
 		return Scaffold(
 			body: Container(
@@ -61,35 +187,36 @@ class _SignUpState extends State<SignUp>
 					child: SingleChildScrollView(
                	padding: EdgeInsets.symmetric(horizontal: 40, vertical: 28),
 						child: Form(
+							key: formKey,
 							child: Column(
 								children: <Widget>[
                         	Text('Respikaf', style: Theme.of(context).textTheme.title),
 
 									SizedBox(height: 40),
-									InputText(label: 'Nombre', typeInput: TextInputType.text, setValue: setValue),
+									InputText(label: 'Nombre', typeInput: TextInputType.text, setValue: setValueName),
 
 									SizedBox(height: 20),
-									InputText(label: 'Apellido', typeInput: TextInputType.text, setValue: setValue),
+									InputText(label: 'Apellido', typeInput: TextInputType.text, setValue: setValueLastName),
 
 									SizedBox(height: 20),
-									InputText(label: 'Telefono', typeInput: TextInputType.text, setValue: setValue),
+									InputText(label: 'Telefono', typeInput: TextInputType.text, setValue: setValuePhone),
 
 									SizedBox(height: 20),
-									InputText(label: 'Correo', typeInput: TextInputType.text, setValue: setValue),
+									InputText(label: 'Correo', typeInput: TextInputType.text, setValue: setValueEmail),
 
 									SizedBox(height: 20),
-									InputText(label: 'Contraseña', typeInput: TextInputType.text, isPassword: true, setValue: setValue),
+									InputText(label: 'Contraseña', typeInput: TextInputType.text, isPassword: true, setValue: setValuePassword),
 
 									SizedBox(height: 20),
-									InputText(label: 'Edad', typeInput: TextInputType.number, setValue: setValue),
+									InputText(label: 'Edad', typeInput: TextInputType.number, setValue: setValueAge),
 
 									SizedBox(height: 20),									
-									InputSelect(items: items, label: 'Tipo de paciente'),
+									InputSelect(items: items, label: 'Tipo de paciente', setValue: setValueTypePacient),
 
 									SizedBox(height: 50),
 									RaisedButton(
 										elevation: 6,
-										onPressed: () { },
+										onPressed: _validateAndSave,
 										child: Text('Crear Cuenta', style: Theme.of(context).textTheme.display1),
 									),
                         
@@ -119,5 +246,15 @@ class _SignUpState extends State<SignUp>
 			),
 		);
 	}
+
+
+	@override
+   Widget build(BuildContext context)
+   {
+      return Scaffold(
+         key: _scaffoldKey,
+         body: ModalProgressHUD(child: _buidlWidget(context), inAsyncCall: _isLoading, opacity: 0.4, color: Colors.black)
+      );
+   }
 }
 

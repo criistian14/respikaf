@@ -5,7 +5,7 @@ import 'dart:convert';
 
 class HttpHandler {
 
-	final String _baseUrl = 'https://light-novels.herokuapp.com/api';
+	final String _baseUrl = 'https://respikaf-v1.herokuapp.com/api';
 
 	Future<dynamic> getJson(String url) async
 	{
@@ -14,4 +14,11 @@ class HttpHandler {
 		return jsonDecode(response.body);
 	}
 
+
+	Future<dynamic> post(String url, Map body) async
+	{
+		http.Response response = await http.post(_baseUrl + url, body: body);
+
+		return jsonDecode(response.body);
+	}
 }

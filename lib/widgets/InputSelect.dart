@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 
 class InputSelect extends StatefulWidget 
 {
-	final List<String> items;
+	final List items;
 	final String label;
+	final Function(dynamic) setValue;
 	
 
-	InputSelect({ @required this.items, @required this.label });
+	InputSelect({ @required this.items, @required this.label, this.setValue });
 
 	@override
 	_InputSelectState createState() => _InputSelectState();
@@ -17,36 +18,14 @@ class InputSelect extends StatefulWidget
 
 class _InputSelectState extends State<InputSelect> 
 {
-	List<DropdownMenuItem<int>> listDrop = [];
-	int _selected;
-
-
-	@override
-	void initState() {
-		super.initState();
-
-		this.loadData();
-	}
-
-	void loadData()
-	{
-		listDrop = [];
-		var i = 0;	
-
-		widget.items.forEach((value) {
-			listDrop.add(DropdownMenuItem(
-				child: Text(value),
-				value: i,
-			));
-
-			i++;
-		});
-	}
+	var _selected;
 
 
 	void _changeValue(value)
 	{
 		setState(() => _selected = value);
+
+		widget.setValue(value);
 	}
 
 
@@ -64,7 +43,7 @@ class _InputSelectState extends State<InputSelect>
 				child: DropdownButton(
 					isExpanded: true,
 					hint: Text(widget.label, style: Theme.of(context).textTheme.body1),
-					items: listDrop,
+					items: widget.items,
 					value: _selected,
 					onChanged: _changeValue,
 				),
