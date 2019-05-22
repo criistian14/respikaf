@@ -33,12 +33,12 @@ class SignUp extends StatefulWidget
 
 class _SignUpState extends State<SignUp> 
 {
-	String name, lastName, phone, email, password, typePacient;
-	int age;
+	String typePacient;
 	List<DropdownMenuItem<dynamic>> items = [];
 	final formKey = GlobalKey<FormState>();
-   final _scaffoldKey = GlobalKey<ScaffoldState>();
-   bool _isLoading = false;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _isLoading = false;
+  TextEditingController ctrlName, ctrlLastName, ctrlPhone, ctrlEmail, ctrlPassword, ctrlAge;
 
 
 
@@ -65,49 +65,11 @@ class _SignUpState extends State<SignUp>
 		));		
 	}
 
-	void setValueName(String value)
-	{
-		setState(() {
-         name = value;
-      });
-	}
-	void setValueLastName(String value)
-	{
-		setState(() {
-         lastName = value;
-      });
-	}
-	void setValuePhone(String value)
-	{
-		setState(() {
-         phone = value;
-      });
-	}
-	void setValueEmail(String value)
-	{
-		setState(() {
-         email = value;
-      });
-	}
-	void setValuePassword(String value)
-	{
-		setState(() {
-         password = value;
-      });
-	}
-	void setValueAge(String value)
-	{
-		setState(() {
-         typePacient = value;
-      });
-	}		
-	void setValueTypePacient(dynamic value)
-	{
-		setState(() {
-         typePacient = value;
-      });
-	}	
-	
+  void setValueTypePacient(dynamic value)
+  {
+    setState(() => typePacient = value);
+  }
+		
 
 
 
@@ -123,19 +85,20 @@ class _SignUpState extends State<SignUp>
          form.save();
 
 			Map data = {
-				"name": "this.name",
-				"lastName": "this.lastName",
-				"email": "this.email",
-				"password": "this.password",
-				"age": "this.age",
-				"phone": "this.phone",
-				"typePacient": "this.typePacient"
+				'name': ctrlName.text,
+				'lastname': ctrlLastName.text,
+				'email': ctrlEmail.text,
+				'password': ctrlPassword.text,
+				'age': ctrlAge.text,
+				'phone': ctrlPhone.text,
+				'typePacient': typePacient
 			};
 
-			print(data);
+			print('Data: $data');
 			
 			var response = await HttpHandler().post('/user/create', data);
 
+	    print('Response: $response');
 
 		
 			setState(() {
@@ -193,22 +156,22 @@ class _SignUpState extends State<SignUp>
                         	Text('Respikaf', style: Theme.of(context).textTheme.title),
 
 									SizedBox(height: 40),
-									InputText(label: 'Nombre', typeInput: TextInputType.text, setValue: setValueName),
+									InputText(label: 'Nombre', typeInput: TextInputType.text, controller: ctrlName,),
 
 									SizedBox(height: 20),
-									InputText(label: 'Apellido', typeInput: TextInputType.text, setValue: setValueLastName),
+									InputText(label: 'Apellido', typeInput: TextInputType.text, controller: ctrlLastName,),
 
 									SizedBox(height: 20),
-									InputText(label: 'Telefono', typeInput: TextInputType.text, setValue: setValuePhone),
+									InputText(label: 'Telefono', typeInput: TextInputType.text, controller: ctrlPhone,),
 
 									SizedBox(height: 20),
-									InputText(label: 'Correo', typeInput: TextInputType.text, setValue: setValueEmail),
+									InputText(label: 'Correo', typeInput: TextInputType.text, controller: ctrlEmail,),
 
 									SizedBox(height: 20),
-									InputText(label: 'Contraseña', typeInput: TextInputType.text, isPassword: true, setValue: setValuePassword),
+									InputText(label: 'Contraseña', typeInput: TextInputType.text, isPassword: true, controller: ctrlPassword,),
 
 									SizedBox(height: 20),
-									InputText(label: 'Edad', typeInput: TextInputType.number, setValue: setValueAge),
+									InputText(label: 'Edad', typeInput: TextInputType.number, controller: ctrlAge,),
 
 									SizedBox(height: 20),									
 									InputSelect(items: items, label: 'Tipo de paciente', setValue: setValueTypePacient),

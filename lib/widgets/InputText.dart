@@ -7,9 +7,17 @@ class InputText extends StatefulWidget
 	final TextInputType typeInput;
 	final bool isPassword;
 	final Function(String) setValue;
+  final TextEditingController controller;
 
 
-	InputText({@required this.label, @required this.typeInput, this.isPassword, this.setValue, this.value});
+	InputText({
+    @required this.label, 
+    @required this.typeInput, 
+    this.isPassword, 
+    this.setValue, 
+    this.value, 
+    this.controller
+  });
 
 	_InputTextState createState() => _InputTextState();
 }
@@ -41,14 +49,16 @@ class _InputTextState extends State<InputText>
 	@override
 	Widget build(BuildContext context)
 	{
-		if (widget.value != null) {
-			_controller.text = widget.value;
-			changeText();
+    if(widget.controller == null) {
+      if (widget.value != null) {
+        _controller.text = widget.value;
+        changeText();
 
-		} else {
+      } else {
 
-			_controller.addListener(changeText);
-		}
+        _controller.addListener(changeText);
+      }
+    }
 
 
 		_inputFocus.addListener(() {
@@ -74,7 +84,7 @@ class _InputTextState extends State<InputText>
 			obscureText: (widget.isPassword == null ? false : widget.isPassword),
 			focusNode: _inputFocus,
 			validator: _validateEmpty,
-			controller: _controller,
+			controller: widget.controller != null ? widget.controller : _controller,
 			onSaved: widget.setValue,
 			style: TextStyle(color: Colors.white, fontSize: 20),
 			decoration: InputDecoration(
