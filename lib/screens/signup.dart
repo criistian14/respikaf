@@ -96,7 +96,7 @@ class _SignUpState extends State<SignUp>
 
 			print('Data: $data');
 			
-			var response = await HttpHandler().post('/user/create', data);
+			var response = await HttpHandler().post('/user/login', data);
 
 	    print('Response: $response');
 

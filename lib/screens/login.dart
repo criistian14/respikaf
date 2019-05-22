@@ -7,6 +7,9 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 // Widgets Custom
 import 'package:respikaf/widgets/InputText.dart';
 
+// Services
+import 'package:respikaf/services/HttpHandler.dart';
+
 // Screens
 import 'package:respikaf/screens/home.dart';
 import 'package:respikaf/screens/signup.dart';
@@ -25,9 +28,10 @@ class _LoginState extends State<Login> {
   final url = '';
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isLoading = false;
-  TextEditingController ctrlEmail = TextEditingController(), ctrlPassword = TextEditingController();
+  TextEditingController ctrlEmail = TextEditingController(),
+      ctrlPassword = TextEditingController();
 
-  void _validateAndSave() {
+  void _validateAndSave() async {
     final form = formKey.currentState;
     if (form.validate()) {
       setState(() {
@@ -36,20 +40,33 @@ class _LoginState extends State<Login> {
 
       form.save();
 
+      Map data = {
+        'email': ctrlEmail.text,
+        'password': ctrlPassword.text,
+      };
 
-      
-
+      var response = await HttpHandler().post('/user/login', data);
 
       new Future.delayed(Duration(seconds: 2), () async {
         setState(() {
           _isLoading = false;
         });
-
         final prefs = await SharedPreferences.getInstance();
 
-        prefs.setString('token', email);
+        // Validate response
+        if (response["message"] == "OK")  {
 
-        // Navigator.of(context).pushReplacementNamed(Home().tag);
+          prefs.setString('token', response["token"]);
+          Navigator.of(context).pushReplacementNamed(Home().tag);
+
+        } else {
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+              content: Text('No coinciden los datos'),
+              duration: Duration(seconds: 3),
+              backgroundColor: Colors.red[800]));
+        } // End Validation
+
+        
       });
     } else {
       print('Form is invalid');
