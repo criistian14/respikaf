@@ -20,7 +20,7 @@ class Settings extends StatefulWidget
 class _SettingsState extends State<Settings> 
 {
 	String dateInitial = '';
-	List<String> items = [];
+	List<DropdownMenuItem<dynamic>> items = [];
 
 
 	@override
@@ -34,9 +34,18 @@ class _SettingsState extends State<Settings>
 	{
 		items = [];
 
-		items.add('Cartucho presurizado');
-		items.add('Polvo seco');
-		items.add('Niebla fina');
+		items.add(DropdownMenuItem(
+			child: Text('Cartucho presurizado'),
+			value: 'Cartucho presurizado',
+		));	
+    items.add(DropdownMenuItem(
+			child: Text('Polvo seco'),
+			value: 'Polvo seco',
+		));	
+    items.add(DropdownMenuItem(
+			child: Text('Niebla fina'),
+			value: 'Niebla fina',
+		));	
 	}
 
 
@@ -96,13 +105,12 @@ class _SettingsState extends State<Settings>
 				Row(
 					children: <Widget>[
 						Container(
-							width: MediaQuery.of(context).size.width / 2,
+							width: MediaQuery.of(context).size.width / 2.4,
 							child: InputSelect(items: items, label: 'Tipo de inhalador'),
 						),
 						
 						SizedBox(width: 10,),
 						Expanded(
-							//width: MediaQuery.of(context).size.width / 3.6,
 							child: InputText(label: 'N. Dosis', typeInput: TextInputType.number),
 						),
 						

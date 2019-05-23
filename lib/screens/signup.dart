@@ -38,7 +38,13 @@ class _SignUpState extends State<SignUp>
 	final formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isLoading = false;
-  TextEditingController ctrlName, ctrlLastName, ctrlPhone, ctrlEmail, ctrlPassword, ctrlAge;
+  TextEditingController 
+    ctrlName = TextEditingController(), 
+    ctrlLastName = TextEditingController(), 
+    ctrlPhone = TextEditingController(), 
+    ctrlEmail = TextEditingController(), 
+    ctrlPassword = TextEditingController(), 
+    ctrlAge = TextEditingController();
 
 
 
@@ -78,62 +84,52 @@ class _SignUpState extends State<SignUp>
       final form = formKey.currentState;
       if (form.validate()) {
 
-         setState(() {
-            _isLoading = true;
-         });
 
-         form.save();
+        setState(() {
+          _isLoading = true;
+        });
 
-			Map data = {
-				'name': ctrlName.text,
-				'lastname': ctrlLastName.text,
-				'email': ctrlEmail.text,
-				'password': ctrlPassword.text,
-				'age': ctrlAge.text,
-				'phone': ctrlPhone.text,
-				'typePacient': typePacient
-			};
+        form.save();
 
-			print('Data: $data');
-			
-			var response = await HttpHandler().post('/user/login', data);
+        Map data = {
+          'name': ctrlName.text,
+          'lastname': ctrlLastName.text,
+          'email': ctrlEmail.text,
+          'password': ctrlPassword.text,
+          'age': ctrlAge.text,
+          'phone': ctrlPhone.text,
+          'tipo': typePacient
+        };
 
-	    print('Response: $response');
+        
+        var response = await HttpHandler().post('/user/create', data);
 
-		
-			setState(() {
-				_isLoading = false;
-			});	
+        setState(() {
+          _isLoading = false;
+        });	
 
+        if (response['response']) {
+          // final prefs = await SharedPreferences.getInstance();
 
-			/*
-         new Future.delayed(Duration(seconds: 2), () async {
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+              content: Text('Se registro correctamente'),
+              duration: Duration(seconds: 3),
+              backgroundColor: Colors.green
+          ));
 
-            setState(() {
-               _isLoading = false;
-            });
+          Navigator.of(context).pushReplacementNamed(Login().tag);
 
+        } else {
 
-            /*
-            _scaffoldKey.currentState.showSnackBar(SnackBar(
-               content: Text('No coinciden los datos'),
-               duration: Duration(seconds: 3),
-               backgroundColor: Colors.red[800]
-            ));
-            */
-
-            final prefs = await SharedPreferences.getInstance();
-
-            prefs.setString('token', email);
-
-            Navigator.of(context).pushReplacementNamed(Login().tag);
-
-         });
-			*/
-         
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+              content: Text('No coinciden los datos'),
+              duration: Duration(seconds: 3),
+              backgroundColor: Colors.red[800]
+          ));
+        }
 
       } else {
-         print('Form is invalid');
+        print('Form is invalid');
       }
    }	
 

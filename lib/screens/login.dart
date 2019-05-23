@@ -47,27 +47,25 @@ class _LoginState extends State<Login> {
 
       var response = await HttpHandler().post('/user/login', data);
 
-      new Future.delayed(Duration(seconds: 2), () async {
-        setState(() {
-          _isLoading = false;
-        });
-        final prefs = await SharedPreferences.getInstance();
+      final prefs = await SharedPreferences.getInstance();
 
-        // Validate response
-        if (response["message"] == "OK")  {
-
-          prefs.setString('token', response["token"]);
-          Navigator.of(context).pushReplacementNamed(Home().tag);
-
-        } else {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
-              content: Text('No coinciden los datos'),
-              duration: Duration(seconds: 3),
-              backgroundColor: Colors.red[800]));
-        } // End Validation
-
-        
+      setState(() {
+        _isLoading = false;
       });
+      
+      // Validate response
+      if (response["message"] == "OK")  {
+
+        prefs.setString('token', response["token"]);
+        Navigator.of(context).pushReplacementNamed(Home().tag);
+
+      } else {
+        _scaffoldKey.currentState.showSnackBar(SnackBar(
+            content: Text('No coinciden los datos'),
+            duration: Duration(seconds: 3),
+            backgroundColor: Colors.red[800]));
+      } // End Validation
+
     } else {
       print('Form is invalid');
     }
