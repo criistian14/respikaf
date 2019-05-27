@@ -52,13 +52,13 @@ class _LoginState extends State<Login> {
       setState(() {
         _isLoading = false;
       });
-      
-      // Validate response
-      if (response["message"] == "OK")  {
 
+		print(response);
+
+      // Validate response
+      if (response["message"] == "OK") {
         prefs.setString('token', response["token"]);
         Navigator.of(context).pushReplacementNamed(Home().tag);
-
       } else {
         _scaffoldKey.currentState.showSnackBar(SnackBar(
             content: Text('No coinciden los datos'),

@@ -31,14 +31,16 @@ class _MyAppState extends State<MyApp>
 			accentColor: Colors.lightBlueAccent[400],
 			dialogBackgroundColor: Colors.grey[300],
 			canvasColor: Colors.grey[850],
-			
+			dialogTheme: DialogTheme(
+				backgroundColor: Colors.grey[850]
+			),
+
 			buttonTheme: ButtonThemeData(
 				shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
 				padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
 				buttonColor: Theme.of(context).accentColor
 			),
 
-			
 			//fontFamily: 'Roboto',
 			textTheme: TextTheme(
 				title: TextStyle(
@@ -143,7 +145,7 @@ class _MyAppState extends State<MyApp>
 				GlobalWidgetsLocalizations.delegate
 			],
 			supportedLocales: [
-				const Locale("es")
+				const Locale("es", "CO")
 			],
 			debugShowCheckedModeBanner: false,
 			routes: routes,

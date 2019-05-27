@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 
 
 // Libraries
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 
 // Widgets Custom
 import 'package:respikaf/widgets/InputText.dart';
 import 'package:respikaf/widgets/InputSelect.dart';
 
+
+// Models
+import 'package:respikaf/models/Alarm.dart';
 
 
 class Settings extends StatefulWidget 
@@ -19,9 +25,14 @@ class Settings extends StatefulWidget
 
 class _SettingsState extends State<Settings> 
 {
-	String dateInitial = '';
-	List<DropdownMenuItem<dynamic>> items = [];
+	String dateInitialString = '', timeInitialString = '';
+	TimeOfDay timeInitial = TimeOfDay.now();
+	DateTime dateInitial = DateTime.now();
+	List<DropdownMenuItem<dynamic>> items = [], itemsFormatTime = [];
+	TextEditingController ctrlHour = new TextEditingController(),
+								ctrlName = new TextEditingController();
 
+	SharedPreferences prefs;
 
 	@override
 	void initState() { 
@@ -30,22 +41,34 @@ class _SettingsState extends State<Settings>
 		this.loadData();	
 	}
 
-	void loadData()
+	void loadData() async
 	{
+		prefs  = await SharedPreferences.getInstance();
+
 		items = [];
 
 		items.add(DropdownMenuItem(
 			child: Text('Cartucho presurizado'),
 			value: 'Cartucho presurizado',
 		));	
-    items.add(DropdownMenuItem(
+    	items.add(DropdownMenuItem(
 			child: Text('Polvo seco'),
 			value: 'Polvo seco',
 		));	
-    items.add(DropdownMenuItem(
+    	items.add(DropdownMenuItem(
 			child: Text('Niebla fina'),
 			value: 'Niebla fina',
 		));	
+
+		itemsFormatTime.add(DropdownMenuItem(
+			child: Text('PM'),
+			value: 'PM',
+		));
+
+		itemsFormatTime.add(DropdownMenuItem(
+			child: Text('AM'),
+			value: 'AM',
+		));
 	}
 
 
@@ -54,7 +77,7 @@ class _SettingsState extends State<Settings>
 	{
 		DateTime picked = await showDatePicker(
 			context: context,
-			initialDate: DateTime.now(),
+			initialDate: dateInitial,
 			firstDate: DateTime(2016),
 			lastDate: DateTime(2020),
 			builder: (BuildContext context, Widget child) {
@@ -69,7 +92,75 @@ class _SettingsState extends State<Settings>
 			}
 		);
 
-		if (picked != null) setState(() => dateInitial = DateFormat('dd - MMMM - yyyy', 'es').format(picked).toString());
+		if (picked != null) setState(() {
+			dateInitialString = DateFormat('dd - MMMM - yyyy', 'es').format(picked).toString();
+			dateInitial = picked;
+		});
+	}
+
+	Future _openPickerTime() async
+	{
+		TimeOfDay picked = await showTimePicker(
+			context: context,
+			initialTime: timeInitial
+		);
+		
+		if (picked != null && picked != timeInitial) setState(() {
+			timeInitialString = picked.format(context);
+			timeInitial = picked;
+		});
+	}
+
+	_saveClock()
+	{
+		Alarm alarmTemp = Alarm(name: ctrlName.text, hour: timeInitialString);
+		
+		String alarmString = jsonEncode(alarmTemp);
+
+		// prefs.setStringList('clocks', List);
+
+		print(alarmString);
+
+		Navigator.of(context).pop();
+	}
+
+
+	_showAddClock()
+	{
+		Alert(
+			context: context,
+			style: AlertStyle(
+				titleStyle: Theme.of(context).textTheme.display2,
+				alertBorder: RoundedRectangleBorder(
+					borderRadius: BorderRadius.circular(10),
+					side: BorderSide(color: Colors.black)
+				)
+			),
+			title: 'Nueva Alarma',
+			content: Column(
+				children: <Widget>[
+					SizedBox(height: 20),
+					InputText(label: 'Nombre',typeInput: TextInputType.text, controller: ctrlName),
+
+					SizedBox(height: 30),
+					GestureDetector(
+						onTap: _openPickerTime,
+						child: AbsorbPointer(
+							child: InputText(label: 'Hora', typeInput: TextInputType.datetime, value: timeInitialString)
+						)
+					),
+				],
+			),
+			buttons: [		
+
+				DialogButton(
+					onPressed: _saveClock,
+					child: Text(
+					"CREAR"
+					),
+				),
+			]
+		).show();
 	}
 
 
@@ -97,7 +188,7 @@ class _SettingsState extends State<Settings>
 				GestureDetector(
 					onTap: _openPickerDate,
 					child: AbsorbPointer(
-						child: InputText(label: 'Fecha Incio del inhalador', typeInput: TextInputType.datetime, value: dateInitial)
+						child: InputText(label: 'Fecha Incio del inhalador', typeInput: TextInputType.datetime, value: dateInitialString)
 					)
 				),
 
@@ -124,15 +215,11 @@ class _SettingsState extends State<Settings>
 
 				_clocks('Alarma 2 (11:00 am)', false),
 
-				_clocks('Alarma 3 (1:30 pm)', true),
-
-				_clocks('Alarma 4 (8:00 pm)', true),
-
 
 				SizedBox(height: 26),
 				Align(
 					alignment: Alignment.bottomCenter,
-					child: FloatingActionButton(onPressed: () { }, child: Icon(Icons.add)),
+					child: FloatingActionButton(onPressed: _showAddClock, child: Icon(Icons.add)),
 				)
 				
 
