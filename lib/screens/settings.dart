@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 
 // Libraries
-import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:intl/intl.dart';
+import 'package:respikaf/models/Alarm.dart';
+import 'package:respikaf/widgets/DialogAddClock.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
@@ -11,10 +12,8 @@ import 'dart:convert';
 // Widgets Custom
 import 'package:respikaf/widgets/InputText.dart';
 import 'package:respikaf/widgets/InputSelect.dart';
+import 'package:respikaf/widgets/ProgressCustom.dart';
 
-
-// Models
-import 'package:respikaf/models/Alarm.dart';
 
 
 class Settings extends StatefulWidget 
@@ -25,14 +24,12 @@ class Settings extends StatefulWidget
 
 class _SettingsState extends State<Settings> 
 {
-	String dateInitialString = '', timeInitialString = '';
-	TimeOfDay timeInitial = TimeOfDay.now();
+	String dateInitialString = '';
 	DateTime dateInitial = DateTime.now();
-	List<DropdownMenuItem<dynamic>> items = [], itemsFormatTime = [];
-	TextEditingController ctrlHour = new TextEditingController(),
-								ctrlName = new TextEditingController();
-
+	List<DropdownMenuItem<dynamic>> items = [];
 	SharedPreferences prefs;
+	bool _loadingClocks = true;
+	List<String> _clocks;
 
 	@override
 	void initState() { 
@@ -43,9 +40,16 @@ class _SettingsState extends State<Settings>
 
 	void loadData() async
 	{
+		items = [];
+		_clocks = [];
+		
+
 		prefs  = await SharedPreferences.getInstance();
 
-		items = [];
+		_clocks = prefs.getStringList('clocks') ?? [];
+
+		setState(() => _loadingClocks = false);
+
 
 		items.add(DropdownMenuItem(
 			child: Text('Cartucho presurizado'),
@@ -59,16 +63,6 @@ class _SettingsState extends State<Settings>
 			child: Text('Niebla fina'),
 			value: 'Niebla fina',
 		));	
-
-		itemsFormatTime.add(DropdownMenuItem(
-			child: Text('PM'),
-			value: 'PM',
-		));
-
-		itemsFormatTime.add(DropdownMenuItem(
-			child: Text('AM'),
-			value: 'AM',
-		));
 	}
 
 
@@ -98,81 +92,49 @@ class _SettingsState extends State<Settings>
 		});
 	}
 
-	Future _openPickerTime() async
-	{
-		TimeOfDay picked = await showTimePicker(
-			context: context,
-			initialTime: timeInitial
-		);
-		
-		if (picked != null && picked != timeInitial) setState(() {
-			timeInitialString = picked.format(context);
-			timeInitial = picked;
-		});
-	}
-
-	_saveClock()
-	{
-		Alarm alarmTemp = Alarm(name: ctrlName.text, hour: timeInitialString);
-		
-		String alarmString = jsonEncode(alarmTemp);
-
-		// prefs.setStringList('clocks', List);
-
-		print(alarmString);
-
-		Navigator.of(context).pop();
-	}
-
 
 	_showAddClock()
 	{
-		Alert(
+		showDialog(
 			context: context,
-			style: AlertStyle(
-				titleStyle: Theme.of(context).textTheme.display2,
-				alertBorder: RoundedRectangleBorder(
-					borderRadius: BorderRadius.circular(10),
-					side: BorderSide(color: Colors.black)
-				)
-			),
-			title: 'Nueva Alarma',
-			content: Column(
-				children: <Widget>[
-					SizedBox(height: 20),
-					InputText(label: 'Nombre',typeInput: TextInputType.text, controller: ctrlName),
-
-					SizedBox(height: 30),
-					GestureDetector(
-						onTap: _openPickerTime,
-						child: AbsorbPointer(
-							child: InputText(label: 'Hora', typeInput: TextInputType.datetime, value: timeInitialString)
-						)
-					),
-				],
-			),
-			buttons: [		
-
-				DialogButton(
-					onPressed: _saveClock,
-					child: Text(
-					"CREAR"
-					),
-				),
-			]
-		).show();
+			builder: (context) => DialogAddClock()
+		);
 	}
 
 
-	Widget _clocks(String name, bool state)
+	Widget _clockItem(String json)
 	{
+		Alarm _tempAlarm = Alarm.fromJson(jsonDecode(json));
+
 		return Row(
 			mainAxisAlignment: MainAxisAlignment.spaceBetween,
 			children: <Widget>[
-				Text(name, style: Theme.of(context).textTheme.body2),
-				Switch(value: state, onChanged: (e) { })
+				Text("${_tempAlarm.name} - ${_tempAlarm.hour}", style: Theme.of(context).textTheme.body2),
+				Switch(value: true, onChanged: (e) { })
 			],
 		);
+	}
+
+
+	Widget _listClocks()
+	{
+		return Container(
+			width: MediaQuery.of(context).size.width,
+			height: MediaQuery.of(context).size.height / 4,
+			child: ListView.builder(
+				//physics: NeverScrollableScrollPhysics(),
+				itemCount: _clocks.length,
+				itemBuilder: (context, index) => _clockItem(_clocks[index]),
+			)
+		);
+	}
+
+	
+	Widget _buildListClocks()
+	{
+		return (_loadingClocks)
+			? ProgressCustom()
+			: _listClocks();
 	}
 
 
@@ -211,9 +173,11 @@ class _SettingsState extends State<Settings>
 				SizedBox(height: 30),
 				Text('Recordatorios', style: Theme.of(context).textTheme.display1),
 				Divider(color: Colors.white),
-				_clocks('Alarma 1 (10:30 am)', true),
 
-				_clocks('Alarma 2 (11:00 am)', false),
+
+				_buildListClocks(),
+			
+				// _clocks('Alarma 1 (10:30 am)', true),
 
 
 				SizedBox(height: 26),

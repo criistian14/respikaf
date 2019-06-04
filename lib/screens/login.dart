@@ -53,8 +53,6 @@ class _LoginState extends State<Login> {
         _isLoading = false;
       });
 
-		print(response);
-
       // Validate response
       if (response["message"] == "OK") {
         prefs.setString('token', response["token"]);

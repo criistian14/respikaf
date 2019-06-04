@@ -32,8 +32,10 @@ class _MyAppState extends State<MyApp>
 			dialogBackgroundColor: Colors.grey[300],
 			canvasColor: Colors.grey[850],
 			dialogTheme: DialogTheme(
-				backgroundColor: Colors.grey[850]
+				backgroundColor: Colors.grey[850],
 			),
+		
+			
 
 			buttonTheme: ButtonThemeData(
 				shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
@@ -145,7 +147,7 @@ class _MyAppState extends State<MyApp>
 				GlobalWidgetsLocalizations.delegate
 			],
 			supportedLocales: [
-				const Locale("es", "CO")
+				const Locale("es", "US")
 			],
 			debugShowCheckedModeBanner: false,
 			routes: routes,
