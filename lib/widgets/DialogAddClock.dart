@@ -17,9 +17,9 @@ import 'package:respikaf/models/Alarm.dart';
 
 class DialogAddClock extends StatefulWidget 
 {
-	final content;
+	final List<Alarm> alarms;
 
-	DialogAddClock({ this.content });
+	DialogAddClock({ @required this.alarms });
 
   @override
   _DialogAddClockState createState() => _DialogAddClockState();
@@ -29,6 +29,7 @@ class DialogAddClock extends StatefulWidget
 class _DialogAddClockState extends State<DialogAddClock> 
 {
 	String timeInitialString = '';
+	bool state = true;
 	TimeOfDay timeInitial = TimeOfDay.now();
 	TextEditingController ctrlHour = new TextEditingController(),
 								ctrlName = new TextEditingController();
@@ -61,19 +62,28 @@ class _DialogAddClockState extends State<DialogAddClock>
 		});
 	}
 
+	
 	Future _saveClock() async
 	{
-		Alarm _alarmTemp = Alarm(name: ctrlName.text, hour: timeInitialString);
-		
+		// Crear alarma temporal
+		Alarm _alarmTemp = Alarm(name: ctrlName.text, hour: timeInitialString, state: state);
+
+		// Agregar alarma a la lista para renderizarla
+		widget.alarms.add(_alarmTemp);
+
+		// Parsear objeto a String
 		String _alarmString = jsonEncode(_alarmTemp);
 
-		List<String> _clocks = prefs.getStringList('clocks') ?? [];
-		_clocks.add(_alarmString);
+		// Obetener lista de alarmas o crearla sino existe
+		List<String> _alarms = prefs.getStringList('alarms') ?? [];
 
+		// Añadir objeto (String) a lista de Strings
+		_alarms.add(_alarmString);
 
-		prefs.setStringList('clocks', _clocks);
+		// Guardar lista de Strings
+		prefs.setStringList('alarms', _alarms);
 
-
+		// Cerrar modal
 		Navigator.of(context).pop();
 	}
 
@@ -109,6 +119,14 @@ class _DialogAddClockState extends State<DialogAddClock>
 								child: InputText(label: 'Hora', typeInput: TextInputType.datetime, value: timeInitialString)
 							)
 						),
+
+						SizedBox(height: 10),
+						Row(
+							mainAxisAlignment: MainAxisAlignment.spaceBetween,
+							children: <Widget>[
+								Text('¿Activa?'),
+								Switch(value: state, onChanged: (value) => setState(() => state = value), ),
+						],),
 
 						SizedBox(height: 25),
 

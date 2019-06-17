@@ -3,16 +3,21 @@ import 'package:flutter/material.dart';
 
 // Libraries
 import 'package:intl/intl.dart';
-import 'package:respikaf/models/Alarm.dart';
 import 'package:respikaf/widgets/DialogAddClock.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 
 // Widgets Custom
+import 'package:respikaf/widgets/AlarmItem.dart';
 import 'package:respikaf/widgets/InputText.dart';
 import 'package:respikaf/widgets/InputSelect.dart';
 import 'package:respikaf/widgets/ProgressCustom.dart';
+
+
+// Models
+import 'package:respikaf/models/Alarm.dart';
 
 
 
@@ -24,33 +29,67 @@ class Settings extends StatefulWidget
 
 class _SettingsState extends State<Settings> 
 {
-	String dateInitialString = '';
-	DateTime dateInitial = DateTime.now();
 	List<DropdownMenuItem<dynamic>> items = [];
-	SharedPreferences prefs;
+	List<String> _alarmsString;
+	List<Alarm> _alarms;
+	String dateInitialString = '';
 	bool _loadingClocks = true;
-	List<String> _clocks;
+	DateTime dateInitial = DateTime.now();
+	SharedPreferences prefs;
+	FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+
 
 	@override
 	void initState() { 
 		super.initState();
 
+		flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+		var android = new AndroidInitializationSettings('app_icon');
+		var ios = new IOSInitializationSettings();
+		var initSettings = new InitializationSettings(android, ios);
+
+		flutterLocalNotificationsPlugin.initialize(initSettings, onSelectNotification: onSelectNotification);
+
 		this.loadData();	
 	}
 
+
+	Future onSelectNotification(String payload) async
+	{
+		debugPrint("payload: $payload");
+		showDialog(context: context, builder: (_) => AlertDialog(title: Text('Notification'), content: Text('$payload'),));
+	}
+
+
+	@override
+	void dispose() 
+	{
+		super.dispose();
+
+		this.saveData();
+	}
+
+
 	void loadData() async
 	{
+		// Inicializar variables para no repetir datos
 		items = [];
-		_clocks = [];
+		_alarmsString = [];
+		_alarms = [];
 		
 
 		prefs  = await SharedPreferences.getInstance();
 
-		_clocks = prefs.getStringList('clocks') ?? [];
+		// Obtener las alarmas guardadas
+		_alarmsString = prefs.getStringList('alarms') ?? [];
 
+		// Parsear y setear las alarmas
+		_alarmsString.forEach((alarm) => _alarms.add(Alarm.fromJson(jsonDecode(alarm))) );
+
+		// Cancelar cargando
 		setState(() => _loadingClocks = false);
 
-
+		// Obtener tipos de inhalador
 		items.add(DropdownMenuItem(
 			child: Text('Cartucho presurizado'),
 			value: 'Cartucho presurizado',
@@ -65,6 +104,18 @@ class _SettingsState extends State<Settings>
 		));	
 	}
 
+
+	void saveData() async
+	{
+		// Inicializar variable
+		_alarmsString = [];
+
+		// Recorrer lista de alarmas y parsearlas a String guardandolas en lista de Stings
+		_alarms.forEach((alarmTemp) => _alarmsString.add(jsonEncode(alarmTemp)));
+
+		// Guardar lista parseada
+		prefs.setStringList('alarms', _alarmsString);
+	}
 
 
 	Future _openPickerDate() async
@@ -97,22 +148,8 @@ class _SettingsState extends State<Settings>
 	{
 		showDialog(
 			context: context,
-			builder: (context) => DialogAddClock()
-		);
-	}
-
-
-	Widget _clockItem(String json)
-	{
-		Alarm _tempAlarm = Alarm.fromJson(jsonDecode(json));
-
-		return Row(
-			mainAxisAlignment: MainAxisAlignment.spaceBetween,
-			children: <Widget>[
-				Text("${_tempAlarm.name} - ${_tempAlarm.hour}", style: Theme.of(context).textTheme.body2),
-				Switch(value: true, onChanged: (e) { })
-			],
-		);
+			builder: (context) => DialogAddClock(alarms: _alarms)
+		).then((value) => setState(() {}));
 	}
 
 
@@ -123,11 +160,11 @@ class _SettingsState extends State<Settings>
 			height: MediaQuery.of(context).size.height / 4,
 			child: ListView.builder(
 				//physics: NeverScrollableScrollPhysics(),
-				itemCount: _clocks.length,
-				itemBuilder: (context, index) => _clockItem(_clocks[index]),
+				itemCount: _alarms.length,
+				itemBuilder: (context, index) => AlarmItem(alarm: _alarms[index]),
 			)
 		);
-	}
+	} 
 
 	
 	Widget _buildListClocks()
@@ -135,6 +172,17 @@ class _SettingsState extends State<Settings>
 		return (_loadingClocks)
 			? ProgressCustom()
 			: _listClocks();
+	} 
+
+
+
+	showNotification() async
+	{
+		var android = new AndroidNotificationDetails('channel id', 'channel NAME', 'CHANNEL DESCRIPTION');
+		var iOS = new IOSNotificationDetails();
+		var platform = new NotificationDetails(android, iOS);
+		
+		await flutterLocalNotificationsPlugin.show(0, 'Hora de aspirar', 'Llego la hora', platform);
 	}
 
 
@@ -177,8 +225,12 @@ class _SettingsState extends State<Settings>
 
 				_buildListClocks(),
 			
-				// _clocks('Alarma 1 (10:30 am)', true),
+				// _alarmsString('Alarma 1 (10:30 am)', true),
 
+				RaisedButton(
+					onPressed: showNotification,
+					child: Text('Notification'),
+				),
 
 				SizedBox(height: 26),
 				Align(

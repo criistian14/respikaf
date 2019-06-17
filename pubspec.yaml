@@ -32,7 +32,7 @@ dependencies:
   percent_indicator: "^1.0.15"
   intl: ^0.15.7
   flutter_pdf_viewer: ^0.0.3
-  #flutter_local_notifications:
+  flutter_local_notifications:
 
 
 dev_dependencies:
