@@ -7,6 +7,7 @@ import 'package:respikaf/widgets/DialogAddClock.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:typed_data';
 
 
 // Widgets Custom
@@ -77,7 +78,6 @@ class _SettingsState extends State<Settings>
 		_alarmsString = [];
 		_alarms = [];
 		
-
 		prefs  = await SharedPreferences.getInstance();
 
 		// Obtener las alarmas guardadas
@@ -176,13 +176,49 @@ class _SettingsState extends State<Settings>
 
 
 
-	showNotification() async
+	_showNotification() async
 	{
-		var android = new AndroidNotificationDetails('channel id', 'channel NAME', 'CHANNEL DESCRIPTION');
-		var iOS = new IOSNotificationDetails();
+		// Tiempo en que va a sonar la notificacion
+    	var scheduledNotificationDateTime = DateTime.now().add(Duration(seconds: 5));
+
+		var vibrationPattern = Int64List(3);
+		vibrationPattern[0] = 1000;
+		vibrationPattern[1] = 5000;
+		vibrationPattern[2] = 2000;
+
+		// Configuracion para android 
+		var android = new AndroidNotificationDetails(
+			'channel id', 
+			'channel NAME', 
+			'CHANNEL DESCRIPTION',
+			icon: 'icon_notifications',
+			largeIconBitmapSource: BitmapSource.Drawable,
+			largeIcon: 'icon_notifications',
+			priority: Priority.Max,
+			importance: Importance.High,
+			sound: 'slow_spring_board',
+			vibrationPattern: vibrationPattern,
+			color: Theme.of(context).accentColor,
+			enableLights: true,
+			ledColor: Theme.of(context).accentColor,
+			ledOnMs: 2000,
+			ledOffMs: 100
+		);
+
+		// Configuracion para IOS 
+		var iOS = new IOSNotificationDetails(sound: 'slow_spring_board');
+
+		// Configuracion para la notificacion 
 		var platform = new NotificationDetails(android, iOS);
 		
-		await flutterLocalNotificationsPlugin.show(0, 'Hora de aspirar', 'Llego la hora', platform);
+		// Mostrar notificacion
+		await flutterLocalNotificationsPlugin.schedule(
+			0, 
+			'Hora de aspirar', 
+			'Llego la hora', 
+			scheduledNotificationDateTime, 
+			platform
+		);
 	}
 
 
@@ -228,7 +264,7 @@ class _SettingsState extends State<Settings>
 				// _alarmsString('Alarma 1 (10:30 am)', true),
 
 				RaisedButton(
-					onPressed: showNotification,
+					onPressed: _showNotification,
 					child: Text('Notification'),
 				),
 

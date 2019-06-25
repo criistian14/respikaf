@@ -39,7 +39,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons:
-
+  # flutter pub pub run flutter_launcher_icons:main
 
 flutter_icons:
   android: true

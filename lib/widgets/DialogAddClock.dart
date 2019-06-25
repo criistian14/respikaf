@@ -66,7 +66,11 @@ class _DialogAddClockState extends State<DialogAddClock>
 	Future _saveClock() async
 	{
 		// Crear alarma temporal
-		Alarm _alarmTemp = Alarm(name: ctrlName.text, hour: timeInitialString, state: state);
+		Alarm _alarmTemp = Alarm(
+			name: ctrlName.text, 
+			hour: timeInitialString, 
+			state: state,
+			time: timeInitial);
 
 		// Agregar alarma a la lista para renderizarla
 		widget.alarms.add(_alarmTemp);
