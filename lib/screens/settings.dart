@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 // Libraries
 import 'package:intl/intl.dart';
-import 'package:respikaf/widgets/DialogAddClock.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -15,6 +14,7 @@ import 'package:respikaf/widgets/AlarmItem.dart';
 import 'package:respikaf/widgets/InputText.dart';
 import 'package:respikaf/widgets/InputSelect.dart';
 import 'package:respikaf/widgets/ProgressCustom.dart';
+import 'package:respikaf/widgets/DialogAddClock.dart';
 
 
 // Models
@@ -45,7 +45,7 @@ class _SettingsState extends State<Settings>
 		super.initState();
 
 		flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-		var android = new AndroidInitializationSettings('app_icon');
+		var android = new AndroidInitializationSettings('icon_notifications_gray');
 		var ios = new IOSInitializationSettings();
 		var initSettings = new InitializationSettings(android, ios);
 
@@ -188,17 +188,17 @@ class _SettingsState extends State<Settings>
 
 		// Configuracion para android 
 		var android = new AndroidNotificationDetails(
-			'channel id', 
-			'channel NAME', 
-			'CHANNEL DESCRIPTION',
+			'channel id 1', 
+			'channel NAME 2', 
+			'CHANNEL DESCRIPTION 3',
 			icon: 'icon_notifications',
+			color: Theme.of(context).accentColor,
 			largeIconBitmapSource: BitmapSource.Drawable,
 			largeIcon: 'icon_notifications',
 			priority: Priority.Max,
 			importance: Importance.High,
 			sound: 'slow_spring_board',
 			vibrationPattern: vibrationPattern,
-			color: Theme.of(context).accentColor,
 			enableLights: true,
 			ledColor: Theme.of(context).accentColor,
 			ledOnMs: 2000,
@@ -214,7 +214,7 @@ class _SettingsState extends State<Settings>
 		// Mostrar notificacion
 		await flutterLocalNotificationsPlugin.schedule(
 			0, 
-			'Hora de aspirar', 
+			'Titulo', 
 			'Llego la hora', 
 			scheduledNotificationDateTime, 
 			platform

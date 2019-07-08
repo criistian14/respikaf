@@ -1,19 +1,29 @@
 class User {
-	String name, lastName, phone, email, password, typePacient;
+	String firstName, lastName, phone, email, password, typePacient;
 	int age;
 
-	User({ this.name, this.lastName, this.phone, this.email, this.password, this.age, this.typePacient });
+	User({ this.firstName, this.lastName, this.phone, this.email, this.password, this.age, this.typePacient });
 
 
 	factory User.fromJson(Map<String, dynamic> json)
 	{
 		return User(
-			name: json['name'] as String,
-			lastName: json['lastName'] as String,
+			firstName: json['firstname'] as String,
+			lastName: json['lastname'] as String,
 			email: json['email'] as String,
 			password: json['password'] as String,
 			age: json['age'] as int,
-			typePacient: json['typePacient'] as String
+			typePacient: json['tipo'] as String
 		);
 	}
+
+	Map<String, dynamic> toJson() => 
+	{
+		'firstname': firstName,
+		'lastname': lastName,
+		'email': email,
+		'password': password,
+		'age': age,
+		'tipo': typePacient
+	};
 }

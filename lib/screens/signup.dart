@@ -68,7 +68,7 @@ class _SignUpState extends State<SignUp> {
       form.save();
 
       Map data = {
-        'name': ctrlName.text,
+        'firstname': ctrlName.text,
         'lastname': ctrlLastName.text,
         'email': ctrlEmail.text,
         'password': ctrlPassword.text,

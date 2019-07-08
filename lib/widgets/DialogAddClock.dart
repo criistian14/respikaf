@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Libraries Custom
+import 'package:respikaf/common/createNotification.dart';
 
 // Widgets Custom
 import 'package:respikaf/widgets/InputText.dart';
@@ -86,6 +88,9 @@ class _DialogAddClockState extends State<DialogAddClock>
 
 		// Guardar lista de Strings
 		prefs.setStringList('alarms', _alarms);
+
+		// Crear la notificacion
+		CreateNotification(context: context, timeOfDay: timeInitial, name: ctrlName.text);
 
 		// Cerrar modal
 		Navigator.of(context).pop();

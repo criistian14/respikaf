@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Libraries
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
@@ -13,6 +14,11 @@ import 'package:respikaf/services/HttpHandler.dart';
 // Screens
 import 'package:respikaf/screens/home.dart';
 import 'package:respikaf/screens/signup.dart';
+
+// Models
+import 'package:respikaf/models/User.dart';
+
+
 
 class Login extends StatefulWidget {
   final String tag = 'login';
@@ -56,6 +62,14 @@ class _LoginState extends State<Login> {
       // Validate response
       if (response["message"] == "OK") {
         prefs.setString('token', response["token"]);
+
+
+			User _userTemp = User.fromJson(response["user"]);
+			String _userString = jsonEncode(_userTemp);
+
+
+        prefs.setString('user', _userString);
+
         Navigator.of(context).pushReplacementNamed(Home().tag);
       } else {
         _scaffoldKey.currentState.showSnackBar(SnackBar(

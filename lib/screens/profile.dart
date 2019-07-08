@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 
 // Libraries
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+
+
+// Models
+import 'package:respikaf/models/User.dart';
 
 
 
@@ -14,7 +19,7 @@ class Profile extends StatefulWidget
 
 class _ProfileState extends State<Profile> 
 {
-	String _name = '';
+	User _user;
 
 
 	@override
@@ -24,7 +29,9 @@ class _ProfileState extends State<Profile>
 
 		SharedPreferences.getInstance().then((result) {
 			setState(() {
-				_name = result.getString('token');
+				_user = json.decode(result.getString('user'));
+
+				print("User Json ${result.getString('user')}");
 			});
 		});
 	}
@@ -53,6 +60,19 @@ class _ProfileState extends State<Profile>
 		);
 	}
 
+	String userName()
+	{	
+		
+	/*
+		if (_user.firstName == '') {
+			return _user.lastName;
+		}
+
+		return _user.firstName;
+		*/
+		return '';
+	}
+
 
 	@override
 	Widget build(BuildContext context) 
@@ -72,13 +92,13 @@ class _ProfileState extends State<Profile>
 						Column(
 							crossAxisAlignment: CrossAxisAlignment.start,
 							children: <Widget>[
-								Text(_name, style: Theme.of(context).textTheme.display1),
+								Text(userName(), style: Theme.of(context).textTheme.display1),
 
 								SizedBox(height: 5),
-								Text('19 años', style: Theme.of(context).textTheme.body2),
+								Text(_user.age.toString(), style: Theme.of(context).textTheme.body2),
 
 								SizedBox(height: 5),
-								Text('Usuario con asma', style: Theme.of(context).textTheme.body2)
+								Text("Usuario con ${_user.typePacient}", style: Theme.of(context).textTheme.body2)
 							],
 						)
 					],
@@ -95,6 +115,7 @@ class _ProfileState extends State<Profile>
 					),
 				),
 
+				/*
 				_elementHistory('01:30 pm', 'Hoy'),
 
 				_elementHistory('10:00 am', 'Hoy'),
@@ -102,7 +123,7 @@ class _ProfileState extends State<Profile>
 				_elementHistory('01:30 pm', '02 de Abril del 2019'),
 
 				_elementHistory('01:30 pm', '01 de Abril del 2019'),
-
+				*/
 	
 
 			],
