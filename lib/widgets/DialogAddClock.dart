@@ -68,29 +68,46 @@ class _DialogAddClockState extends State<DialogAddClock>
 	Future _saveClock() async
 	{
 		// Crear alarma temporal
-		Alarm _alarmTemp = Alarm(
+		Alarm _alarmTemp = new Alarm(
 			name: ctrlName.text, 
-			hour: timeInitialString, 
+			hour: timeInitial.hour, 
+			minute: timeInitial.minute, 
 			state: state,
-			time: timeInitial);
+			time: timeInitialString);
+
+		print('01');
 
 		// Agregar alarma a la lista para renderizarla
 		widget.alarms.add(_alarmTemp);
+		print('02');
 
 		// Parsear objeto a String
 		String _alarmString = jsonEncode(_alarmTemp);
+		print('03');
 
 		// Obetener lista de alarmas o crearla sino existe
 		List<String> _alarms = prefs.getStringList('alarms') ?? [];
+		print('04');
 
 		// Añadir objeto (String) a lista de Strings
 		_alarms.add(_alarmString);
+		print('05');
+
 
 		// Guardar lista de Strings
 		prefs.setStringList('alarms', _alarms);
+		print('06');
+
 
 		// Crear la notificacion
-		CreateNotification(context: context, timeOfDay: timeInitial, name: ctrlName.text);
+		CreateNotification(
+			context: context, 
+			hour: _alarmTemp.hour, 
+			minute: _alarmTemp.minute, 
+			name: _alarmTemp.name
+		);
+
+		print('07');
 
 		// Cerrar modal
 		Navigator.of(context).pop();

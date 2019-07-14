@@ -9,11 +9,11 @@ import 'dart:typed_data';
 class CreateNotification 
 {
 	final context;
-	final TimeOfDay timeOfDay;
+	final int hour, minute;
 	final String name; 
 	FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-	CreateNotification({ this.context, this.timeOfDay, this.name })
+	CreateNotification({ this.context, this.hour, this.minute, this.name })
 	{
 		flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
 		var android = new AndroidInitializationSettings('icon_notifications_gray');
@@ -29,7 +29,7 @@ class CreateNotification
 	initNotification() async
 	{
 		// Tiempo en que va a sonar la notificacion
-		var _time = Time(timeOfDay.hour, timeOfDay.minute, 0);
+		var _time = Time(hour, minute, 0);
 
 		var vibrationPattern = Int64List(3);
 		vibrationPattern[0] = 1000;

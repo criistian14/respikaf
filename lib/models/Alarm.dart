@@ -1,25 +1,29 @@
-import 'package:flutter/material.dart';
-
 class Alarm 
 {
-	final String name, hour;
+	final String name, time;
 	bool state = true;
-	TimeOfDay time;
+	int hour, minute;
 
-	Alarm({this.name, this.hour, this.time, this.state});
+	Alarm({this.name, this.hour, this.minute, this.time, this.state});
 
 
-	Alarm.fromJson(Map<String, dynamic> json)
-		: name = json['name'],
-		  hour = json['hour'],
-		  time = json['time'],
-		  state = json['state'];
+	factory Alarm.fromJson(Map<String, dynamic> json)
+	{
+		return Alarm(
+			name : json['name'] as String,
+			hour : json['hour'] as int,
+			minute : json['minute'] as int,
+			time : json['time'] as String,
+			state : json['state'] as bool
+		);
+	}
 
 
 	Map<String, dynamic> toJson() => 
 	{
 		'name' : name,
 		'hour' : hour,
+		'minute' : minute,
 		'time' : time,
 		'state': state
 	};

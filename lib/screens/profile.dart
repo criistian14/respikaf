@@ -20,6 +20,7 @@ class Profile extends StatefulWidget
 class _ProfileState extends State<Profile> 
 {
 	User _user;
+	bool _loading = true;
 
 
 	@override
@@ -27,14 +28,22 @@ class _ProfileState extends State<Profile>
 	{
 		super.initState();
 
+		// Obtener datos guardados localmente
 		SharedPreferences.getInstance().then((result) {
 			setState(() {
-				_user = json.decode(result.getString('user'));
 
-				print("User Json ${result.getString('user')}");
+				// Obtener el usuario actual
+				String _userString = result.getString('user');
+
+				// Parsear y setear el usuario
+				_user = User.fromJson(json.decode(_userString));
+
+				// Cambiar estado de cargando
+				_loading = false;
 			});
 		});
 	}
+
 
 	Widget _elementHistory(String hour, String date)
 	{
@@ -60,18 +69,57 @@ class _ProfileState extends State<Profile>
 		);
 	}
 
+
 	String userName()
 	{	
-		
-	/*
-		if (_user.firstName == '') {
-			return _user.lastName;
+		// Inicializar el nombre
+		String _name = "";
+
+		// Comprobar si ya termino de cargar
+		if (!_loading) {
+			
+			// Comprobar si el nombre esta vacio entonces setear el apellido
+			if (_user.firstName.isEmpty) {
+				_name = _user.lastName;
+			} else {
+				_name = _user.firstName;
+			}
 		}
 
-		return _user.firstName;
-		*/
-		return '';
+		// Regresar el nombre
+		return _name;
 	}
+
+
+	String typePacient()
+	{	
+		// Inicializar el tipo de paciente
+		String _type = "Usuario con ";
+
+		// Comprobar si ya termino de cargar
+		if (!_loading) {
+			_type += _user.typePacient;
+		}
+
+		// Regresar el tipo de paciente
+		return _type;
+	}	
+
+
+	String age()
+	{	
+		// Inicializar la edad
+		String _age = "";
+
+		// Comprobar si ya termino de cargar
+		if (!_loading) {
+			_age = "${_user.age} años";
+		}
+
+		// Regresar la edad
+		return _age;
+	}	
+	
 
 
 	@override
@@ -95,10 +143,10 @@ class _ProfileState extends State<Profile>
 								Text(userName(), style: Theme.of(context).textTheme.display1),
 
 								SizedBox(height: 5),
-								Text(_user.age.toString(), style: Theme.of(context).textTheme.body2),
+								Text(age(), style: Theme.of(context).textTheme.body2),
 
 								SizedBox(height: 5),
-								Text("Usuario con ${_user.typePacient}", style: Theme.of(context).textTheme.body2)
+								Text(typePacient(), style: Theme.of(context).textTheme.body2)
 							],
 						)
 					],
