@@ -6,29 +6,30 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:typed_data';
 
 
-class CreateNotification 
+class Notifications 
 {
-	final context;
-	final int hour, minute;
-	final String name; 
+	BuildContext context;
+	int hour, minute;
+	String name; 
 	FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
-
-	CreateNotification({ this.context, this.hour, this.minute, this.name})
+	Notifications()
 	{
 		flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
 		var android = new AndroidInitializationSettings('icon_notifications_gray');
 		var ios = new IOSInitializationSettings();
 		var initSettings = new InitializationSettings(android, ios);
 
-		flutterLocalNotificationsPlugin.initialize(initSettings, onSelectNotification: onSelectNotification);
-
-		this.initNotification();
+		this.flutterLocalNotificationsPlugin.initialize(initSettings, onSelectNotification: onSelectNotification);
 	}
 
 
-	initNotification() async
+	void createNotification({ context, hour, minute, name}) async
 	{
+		this.context = context;
+
+		debugPrint(this.context.toString());
+
 		// Tiempo en que va a sonar la notificacion
 		var _time = Time(hour, minute, 0);
 
@@ -63,7 +64,7 @@ class CreateNotification
 		var platform = new NotificationDetails(android, iOS);
 
 		// Mostrar notificacion
-		await flutterLocalNotificationsPlugin.showDailyAtTime(
+		await this.flutterLocalNotificationsPlugin.showDailyAtTime(
 			0, 
 			'Hora del inhalador', 
 			name, 
@@ -77,5 +78,11 @@ class CreateNotification
 	{
 		debugPrint("payload: $payload");
 		showDialog(context: context, builder: (_) => AlertDialog(title: Text('Notification'), content: Text('$payload'),));
+	}
+
+
+	void clearNotification()
+	{
+		this.flutterLocalNotificationsPlugin.cancelAll();
 	}
 }

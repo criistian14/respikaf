@@ -26,8 +26,8 @@ class _InhaladorState extends State<Inhalador>
 					radius: 150,
 					lineWidth: 10,
 					circularStrokeCap: CircularStrokeCap.round,
-					percent: .6,
-					center: Text('60%', style: Theme.of(context).textTheme.display3),
+					percent: 1,
+					center: Text('100%', style: Theme.of(context).textTheme.display3),
 					progressColor: Theme.of(context).accentColor,
 					animation: true,
 					animationDuration: 1200
@@ -40,22 +40,22 @@ class _InhaladorState extends State<Inhalador>
 					children: <Widget>[
 						Column(
 							children: <Widget>[
-								Text('5', style: Theme.of(context).textTheme.display2),
+								Text('0', style: Theme.of(context).textTheme.display2),
 								Text('Faltantes'),
 
 								SizedBox(height: 35),
-								Text('2', style: Theme.of(context).textTheme.display2),
+								Text('0', style: Theme.of(context).textTheme.display2),
 								Text('Rechazadas')
 							],
 						),
 
 						Column(
 							children: <Widget>[
-								Text('15', style: Theme.of(context).textTheme.display2),
+								Text('0', style: Theme.of(context).textTheme.display2),
 								Text('Completadas'),
 
 								SizedBox(height: 35),
-								Text('25', style: Theme.of(context).textTheme.display2),
+								Text('0', style: Theme.of(context).textTheme.display2),
 								Text('Siguiente mes')
 							],
 						),

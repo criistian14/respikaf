@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+
+// Libraries Custom
+import 'package:respikaf/common/notifications.dart';
 
 
 // Widgets Custom
@@ -36,37 +39,33 @@ class _SettingsState extends State<Settings>
 	bool _loadingClocks = true;
 	DateTime dateInitial = DateTime.now();
 	SharedPreferences prefs;
-	FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
 
 	@override
-	void initState() { 
+	void initState() 
+	{ 
 		super.initState();
-
-		flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
-		var android = new AndroidInitializationSettings('icon_notifications_gray');
-		var ios = new IOSInitializationSettings();
-		var initSettings = new InitializationSettings(android, ios);
-
-		flutterLocalNotificationsPlugin.initialize(initSettings, onSelectNotification: onSelectNotification);
 
 		this.loadData();	
 	}
 
 
-	Future onSelectNotification(String payload) async
+	@override
+	void deactivate() 
 	{
-		debugPrint("payload: $payload");
-		showDialog(context: context, builder: (_) => AlertDialog(title: Text('Notification'), content: Text('$payload'),));
+		// Generar las notificaciones
+		this._generateNotification();
+
+		super.deactivate();
 	}
 
 
 	@override
 	void dispose() 
 	{
-		super.dispose();
-
 		this.saveData();
+
+		super.dispose();
 	}
 
 
@@ -84,6 +83,9 @@ class _SettingsState extends State<Settings>
 
 		// Parsear y setear las alarmas
 		_alarmsString.forEach((alarm) => _alarms.add(Alarm.fromJson(jsonDecode(alarm))) );
+
+		// Generar las notificaciones
+		_generateNotification();
 
 		// Cancelar cargando
 		setState(() => _loadingClocks = false);
@@ -117,6 +119,29 @@ class _SettingsState extends State<Settings>
 	}
 
 
+	_generateNotification()
+	{
+		// Limpiar todas las notificaciones
+		Notifications().clearNotification();
+
+		// Recorrer las alarmas para activar las notificaciones
+		_alarms.forEach((alarm) {
+			
+			// Comprobar si la arma esta activa
+			if (alarm.state) {
+				
+				// Crear la notificacion
+				Notifications().createNotification(
+					context: context, 
+					hour: alarm.hour, 
+					minute: alarm.minute, 
+					name: alarm.name
+				);
+			}
+		});
+	}
+
+
 	Future _openPickerDate() async
 	{
 		DateTime picked = await showDatePicker(
@@ -143,12 +168,22 @@ class _SettingsState extends State<Settings>
 	}
 
 
-	_showAddClock()
+	void _showAddClock()
 	{
 		showDialog(
 			context: context,
 			builder: (context) => DialogAddClock(alarms: _alarms)
 		).then((value) => setState(() {}));
+	}
+
+
+	void deleteAlarm(index)
+	{
+		_alarms.removeAt(index);
+
+		setState(() { });
+
+		Navigator.of(context).pop();
 	}
 
 
@@ -160,7 +195,11 @@ class _SettingsState extends State<Settings>
 			child: ListView.builder(
 				//physics: NeverScrollableScrollPhysics(),
 				itemCount: _alarms.length,
-				itemBuilder: (context, index) => AlarmItem(alarm: _alarms[index]),
+				itemBuilder: (context, index) => AlarmItem(
+					alarm: _alarms[index], 
+					deleteAlarm: deleteAlarm, 
+					index: index
+				),
 			)
 		);
 	} 
@@ -210,15 +249,7 @@ class _SettingsState extends State<Settings>
 				Text('Recordatorios', style: Theme.of(context).textTheme.display1),
 				Divider(color: Colors.white),
 
-
 				_buildListClocks(),
-			
-				// _alarmsString('Alarma 1 (10:30 am)', true),
-
-				/*RaisedButton(
-					onPressed: _showNotification,
-					child: Text('Notification'),
-				),*/
 
 				SizedBox(height: 26),
 				Align(
@@ -226,7 +257,6 @@ class _SettingsState extends State<Settings>
 					child: FloatingActionButton(onPressed: _showAddClock, child: Icon(Icons.add)),
 				)
 				
-
 			],
 		);
 	}

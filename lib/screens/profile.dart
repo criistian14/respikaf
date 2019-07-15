@@ -45,31 +45,6 @@ class _ProfileState extends State<Profile>
 	}
 
 
-	Widget _elementHistory(String hour, String date)
-	{
-		return Container(
-			padding: EdgeInsets.all(0),
-			margin: EdgeInsets.all(0),
-			width: MediaQuery.of(context).size.width,
-			child: Card(
-				color: Theme.of(context).primaryColor,
-				elevation: .5,
-				child: Padding(
-					padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-					child: Row(
-						children: <Widget>[
-							Text(hour, style: Theme.of(context).textTheme.subhead),
-							
-							SizedBox(width: 10),
-							Text(date, style: Theme.of(context).textTheme.body2),
-						],
-					),
-				),
-			),
-		);
-	}
-
-
 	String userName()
 	{	
 		// Inicializar el nombre
@@ -165,12 +140,6 @@ class _ProfileState extends State<Profile>
 
 				/*
 				_elementHistory('01:30 pm', 'Hoy'),
-
-				_elementHistory('10:00 am', 'Hoy'),
-				
-				_elementHistory('01:30 pm', '02 de Abril del 2019'),
-
-				_elementHistory('01:30 pm', '01 de Abril del 2019'),
 				*/
 	
 

@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Libraries Custom
-import 'package:respikaf/common/createNotification.dart';
+import 'package:respikaf/common/notifications.dart';
 
 // Widgets Custom
 import 'package:respikaf/widgets/InputText.dart';
@@ -55,7 +55,17 @@ class _DialogAddClockState extends State<DialogAddClock>
 	{
 		TimeOfDay picked = await showTimePicker(
 			context: context,
-			initialTime: timeInitial
+			initialTime: timeInitial,
+			builder: (BuildContext context, Widget child) {
+				return Theme(
+					data: ThemeData(
+						primaryColor: Theme.of(context).primaryColor,
+						accentColor: Theme.of(context).accentColor,
+						dialogBackgroundColor: Theme.of(context).dialogBackgroundColor,
+					),
+					child: child,
+				);
+			}
 		);
 		
 		if (picked != null && picked != timeInitial) setState(() {
@@ -73,41 +83,35 @@ class _DialogAddClockState extends State<DialogAddClock>
 			hour: timeInitial.hour, 
 			minute: timeInitial.minute, 
 			state: state,
-			time: timeInitialString);
-
-		print('01');
+			time: timeInitialString
+		);
 
 		// Agregar alarma a la lista para renderizarla
 		widget.alarms.add(_alarmTemp);
-		print('02');
 
 		// Parsear objeto a String
 		String _alarmString = jsonEncode(_alarmTemp);
-		print('03');
 
 		// Obetener lista de alarmas o crearla sino existe
 		List<String> _alarms = prefs.getStringList('alarms') ?? [];
-		print('04');
 
 		// Añadir objeto (String) a lista de Strings
 		_alarms.add(_alarmString);
-		print('05');
-
 
 		// Guardar lista de Strings
 		prefs.setStringList('alarms', _alarms);
-		print('06');
+	
+		// Comprobar si la arma esta activa
+		if (_alarmTemp.state) {
 
-
-		// Crear la notificacion
-		CreateNotification(
-			context: context, 
-			hour: _alarmTemp.hour, 
-			minute: _alarmTemp.minute, 
-			name: _alarmTemp.name
-		);
-
-		print('07');
+			// Crear la notificacion
+			Notifications().createNotification(
+				context: context, 
+				hour: _alarmTemp.hour, 
+				minute: _alarmTemp.minute, 
+				name: _alarmTemp.name
+			);
+		}
 
 		// Cerrar modal
 		Navigator.of(context).pop();
