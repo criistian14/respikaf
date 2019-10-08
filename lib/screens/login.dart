@@ -6,10 +6,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 // Widgets Custom
-import 'package:respikaf/widgets/InputText.dart';
+import 'package:respikaf/components/InputText.dart';
 
 // Services
-import 'package:respikaf/services/HttpHandler.dart';
+import 'package:respikaf/services/UserService.dart';
 
 // Screens
 import 'package:respikaf/screens/home.dart';
@@ -51,32 +51,35 @@ class _LoginState extends State<Login> {
         'password': ctrlPassword.text,
       };
 
-      var response = await HttpHandler().post('/user/login', data);
+      var response = await UserService().login(data: data);
 
-      final prefs = await SharedPreferences.getInstance();
 
       setState(() {
         _isLoading = false;
       });
 
-      // Validate response
-      if (response["message"] == "OK") {
-        prefs.setString('token', response["token"]);
+      if (response["status"] == "success") {
+
+        final prefs = await SharedPreferences.getInstance();
+
+        prefs.setString('token', "${response['token_type']} ${response['access_token']}");
 
 
-			User _userTemp = User.fromJson(response["user"]);
-			String _userString = jsonEncode(_userTemp);
+        User _userTemp = User.fromJson(response["user"]);
+        String _userString = jsonEncode(_userTemp);
 
 
         prefs.setString('user', _userString);
 
         Navigator.of(context).pushReplacementNamed(Home().tag);
+
       } else {
+
         _scaffoldKey.currentState.showSnackBar(SnackBar(
-            content: Text('No coinciden los datos'),
+            content: Text(response['message']),
             duration: Duration(seconds: 3),
             backgroundColor: Colors.red[800]));
-      } // End Validation
+      } 
 
     } else {
       print('Form is invalid');

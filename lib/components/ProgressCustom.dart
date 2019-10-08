@@ -12,11 +12,11 @@ class _ProgressCustomState extends State<ProgressCustom>
 	@override
 	Widget build(BuildContext context) 
 	{
-		return Container(
-			height: 80,
+		return SizedBox(
+			height: 500,
 			child: Center(
 				child: CircularProgressIndicator(
-					valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).accentColor)
+					valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).primaryColor)
 				)
 			),
 		);

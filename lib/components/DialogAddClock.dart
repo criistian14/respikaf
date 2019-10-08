@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:respikaf/common/notifications.dart';
 
 // Widgets Custom
-import 'package:respikaf/widgets/InputText.dart';
+import 'package:respikaf/components/InputText.dart';
 
 
 // Models

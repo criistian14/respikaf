@@ -12,11 +12,11 @@ import 'package:respikaf/common/notifications.dart';
 
 
 // Widgets Custom
-import 'package:respikaf/widgets/AlarmItem.dart';
-import 'package:respikaf/widgets/InputText.dart';
-import 'package:respikaf/widgets/InputSelect.dart';
-import 'package:respikaf/widgets/ProgressCustom.dart';
-import 'package:respikaf/widgets/DialogAddClock.dart';
+import 'package:respikaf/components/AlarmItem.dart';
+import 'package:respikaf/components/InputText.dart';
+import 'package:respikaf/components/InputSelect.dart';
+import 'package:respikaf/components/ProgressCustom.dart';
+import 'package:respikaf/components/DialogAddClock.dart';
 
 
 // Models
@@ -91,6 +91,8 @@ class _SettingsState extends State<Settings>
 		setState(() => _loadingClocks = false);
 
 		// Obtener tipos de inhalador
+
+    /*
 		items.add(DropdownMenuItem(
 			child: Text('Cartucho presurizado'),
 			value: 'Cartucho presurizado',
@@ -103,6 +105,7 @@ class _SettingsState extends State<Settings>
 			child: Text('Niebla fina'),
 			value: 'Niebla fina',
 		));	
+    */
 	}
 
 

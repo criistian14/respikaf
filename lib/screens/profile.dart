@@ -54,10 +54,10 @@ class _ProfileState extends State<Profile>
 		if (!_loading) {
 			
 			// Comprobar si el nombre esta vacio entonces setear el apellido
-			if (_user.firstName.isEmpty) {
-				_name = _user.lastName;
+			if (_user.name.isEmpty) {
+				_name = _user.lastname;
 			} else {
-				_name = _user.firstName;
+				_name = _user.name;
 			}
 		}
 
@@ -73,7 +73,7 @@ class _ProfileState extends State<Profile>
 
 		// Comprobar si ya termino de cargar
 		if (!_loading) {
-			_type += _user.typePacient;
+			// _type += _user.typePatientId;
 		}
 
 		// Regresar el tipo de paciente
