@@ -28,10 +28,6 @@ import 'package:respikaf/models/Alarm.dart';
 import 'package:respikaf/models/TypeInhalador.dart';
 
 
-// Utilities
-import 'package:respikaf/common/size_config.dart';
-
-
 
 class Settings extends StatefulWidget 
 {
@@ -43,7 +39,10 @@ class _SettingsState extends State<Settings>
 {
 	List<DropdownMenuItem<dynamic>> typesInhaladorItems = [];
   List<TypeInhalador> typesInhalador = [];
+	List<String> _alarmsString;
+	List<Alarm> _alarms;
 	String dateInitialString = '';
+	bool _loadingClocks = true;
 	DateTime dateInitial = DateTime.now();
 	SharedPreferences prefs;
   int typeInhalador;
@@ -53,39 +52,77 @@ class _SettingsState extends State<Settings>
 	@override
 	void initState() 
 	{ 
-		super.initState();	
+		super.initState();
+
+		this.loadData();	
 	}
 
 
-  /*
-  * Obtener los tipos de inhalador apropiados para el usuario
-  *
-  * @return [List<DropdownMenuItem>] typesInhaladorItems
-  */
+	@override
+	void deactivate() 
+	{
+		// Generar las notificaciones
+		this._generateNotification();
+
+		super.deactivate();
+	}
+
+
+	@override
+	void dispose() 
+	{
+		this.saveData();
+
+		super.dispose();
+	}
+
+
+	void loadData() async
+	{
+		// Inicializar variables para no repetir datos
+		typesInhaladorItems = [];
+		_alarmsString = [];
+		_alarms = [];
+		
+		prefs  = await SharedPreferences.getInstance();
+
+		// Obtener las alarmas guardadas
+		_alarmsString = prefs.getStringList('alarms') ?? [];
+
+		// Parsear y setear las alarmas
+		_alarmsString.forEach((alarm) => _alarms.add(Alarm.fromJson(jsonDecode(alarm))) );
+
+		// Generar las notificaciones
+		_generateNotification();
+
+		// Cancelar cargando
+		setState(() => _loadingClocks = false);
+	}
+
+
   Future<List<DropdownMenuItem>> _loadTypesIhalador() async 
   {
-    // var response = await TypeInhaladorService().getForUser();
+    var response = await TypeInhaladorService().getForUser();
 
-    // if (response['status'] == 'success') {
-    //   typesInhaladorItems = [];
+    if (response['status'] == 'success') {
+      typesInhaladorItems = [];
 
-    //   for (var i = 0; i < response['data'].length; i++) {
+      for (var i = 0; i < response['data'].length; i++) {
 
-    //     TypeInhalador typeInhaladorTemp = TypeInhalador.fromJson(response['data'][i]); 
+        TypeInhalador typeInhaladorTemp = TypeInhalador.fromJson(response['data'][i]); 
 
-    //     typesInhalador.add(typeInhaladorTemp);
+        typesInhalador.add(typeInhaladorTemp);
 
-    //     typesInhaladorItems.add(DropdownMenuItem(
-    //       child: Text(typeInhaladorTemp.name),
-    //       value: typeInhaladorTemp.id,
-    //     ));
-    //   }
-    // }
+        typesInhaladorItems.add(DropdownMenuItem(
+          child: Text(typeInhaladorTemp.name),
+          value: typeInhaladorTemp.id,
+        ));
+      }
+    }
 
-    // return typesInhaladorItems;
-
-    return [];
+    return typesInhaladorItems;
   }
+
 
 
   /*
@@ -103,17 +140,49 @@ class _SettingsState extends State<Settings>
   }  
 
 
-  /*
-  * Mostrar un date picker solicitando la fecha para iniciar 
-  *
-  * @return [DatePicker] showDatePicker
-  */
+
+	void saveData() async
+	{
+		// Inicializar variable
+		_alarmsString = [];
+
+		// Recorrer lista de alarmas y parsearlas a String guardandolas en lista de Stings
+		_alarms.forEach((alarmTemp) => _alarmsString.add(jsonEncode(alarmTemp)));
+
+		// Guardar lista parseada
+		prefs.setStringList('alarms', _alarmsString);
+	}
+
+
+	_generateNotification()
+	{
+		// Limpiar todas las notificaciones
+		Notifications().clearNotification();
+
+		// Recorrer las alarmas para activar las notificaciones
+		_alarms.forEach((alarm) {
+			
+			// Comprobar si la arma esta activa
+			if (alarm.state) {
+				
+				// Crear la notificacion
+				Notifications().createNotification(
+					context: context, 
+					hour: alarm.hour, 
+					minute: alarm.minute, 
+					name: alarm.name
+				);
+			}
+		});
+	}
+
+
 	Future _openPickerDate() async
 	{
 		DateTime picked = await showDatePicker(
 			context: context,
 			initialDate: dateInitial,
-			firstDate: DateTime.now(),
+			firstDate: DateTime(2016),
 			lastDate: DateTime(2020),
 			builder: (BuildContext context, Widget child) {
 				return Theme(
@@ -134,10 +203,48 @@ class _SettingsState extends State<Settings>
 	}
 
 
+	void _showAddClock()
+	{
+		showDialog(
+			context: context,
+			builder: (context) => DialogAddClock(alarms: _alarms)
+		).then((value) => setState(() {}));
+	}
 
+
+	void deleteAlarm(index)
+	{
+		_alarms.removeAt(index);
+
+		setState(() { });
+
+		Navigator.of(context).pop();
+	}
+
+
+	Widget _listClocks()
+	{
+		return Container(
+			width: MediaQuery.of(context).size.width,
+			height: MediaQuery.of(context).size.height / 4,
+			child: ListView.builder(
+				//physics: NeverScrollableScrollPhysics(),
+				itemCount: _alarms.length,
+				itemBuilder: (context, index) => AlarmItem(
+					alarm: _alarms[index], 
+					deleteAlarm: deleteAlarm, 
+					index: index
+				),
+			)
+		);
+	} 
+
+	
 	Widget _buildListClocks()
 	{
-		return ProgressCustom();
+		return (_loadingClocks)
+			? ProgressCustom()
+			: _listClocks();
 	} 
 
 
@@ -179,9 +286,6 @@ class _SettingsState extends State<Settings>
   @override
 	Widget build(BuildContext context) 
 	{
-    // Dimensiones estandar 
-    SizeConfig().init(context);
-
 		return Column(
 			crossAxisAlignment: CrossAxisAlignment.start,
 			children: <Widget>[
@@ -214,10 +318,10 @@ class _SettingsState extends State<Settings>
 				_buildListClocks(),
 
 				SizedBox(height: 26),
-				// Align(
-				// 	alignment: Alignment.bottomCenter,
-				// 	child: FloatingActionButton(onPressed: _showAddClock, child: Icon(Icons.add)),
-				// )
+				Align(
+					alignment: Alignment.bottomCenter,
+					child: FloatingActionButton(onPressed: _showAddClock, child: Icon(Icons.add)),
+				)
 				
 			],
 		);

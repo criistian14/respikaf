@@ -7,6 +7,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:respikaf/screens/home.dart';
 import 'package:respikaf/screens/login.dart';
 import 'package:respikaf/screens/signup.dart';
+import 'package:respikaf/screens/recover_password.dart';
 
 
 
@@ -21,7 +22,8 @@ class _MyAppState extends State<MyApp>
 	final routes = <String, WidgetBuilder>{
 		Home().tag: (BuildContext context) => Home(),
 		Login().tag: (BuildContext context) => Login(),
-		SignUp().tag: (BuildContext context) => SignUp()
+		SignUp().tag: (BuildContext context) => SignUp(),
+		RecoverPassword().tag: (BuildContext context) => RecoverPassword(),
 	};
 
 	ThemeData theme()

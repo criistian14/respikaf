@@ -14,20 +14,25 @@ import 'package:respikaf/services/UserService.dart';
 // Screens
 import 'package:respikaf/screens/home.dart';
 import 'package:respikaf/screens/signup.dart';
+import 'package:respikaf/screens/recover_password.dart';
 
 // Models
 import 'package:respikaf/models/User.dart';
 
+// Utilities
+import 'package:respikaf/common/size_config.dart';
 
 
-class Login extends StatefulWidget {
+class Login extends StatefulWidget 
+{
   final String tag = 'login';
 
   @override
   _LoginState createState() => _LoginState();
 }
 
-class _LoginState extends State<Login> {
+class _LoginState extends State<Login> 
+{
   String email;
   String password;
   final formKey = GlobalKey<FormState>();
@@ -37,8 +42,14 @@ class _LoginState extends State<Login> {
   TextEditingController ctrlEmail = TextEditingController(),
       ctrlPassword = TextEditingController();
 
-  void _validateAndSave() async {
+
+  /*
+  * Validar el formulario y enviarlo
+  */
+  void _validateAndSave() async 
+  {
     final form = formKey.currentState;
+
     if (form.validate()) {
       setState(() {
         _isLoading = true;
@@ -62,12 +73,15 @@ class _LoginState extends State<Login> {
 
         final prefs = await SharedPreferences.getInstance();
 
-        prefs.setString('token', "${response['token_type']} ${response['access_token']}");
+        String tokenFull = "${response['token_type']} ${response['access_token']}";
+        int sizeString = tokenFull.length;
+
+        prefs.setString('token1', tokenFull.substring(0, (sizeString / 2).ceil()));
+        prefs.setString('token2', tokenFull.substring((sizeString / 2).ceil(), sizeString));
 
 
         User _userTemp = User.fromJson(response["user"]);
         String _userString = jsonEncode(_userTemp);
-
 
         prefs.setString('user', _userString);
 
@@ -86,66 +100,139 @@ class _LoginState extends State<Login> {
     }
   }
 
-  Widget _buidlWidget() {
+
+  /*
+   * Texto para registrarse
+   * 
+   * @return [Widget]
+   */
+  Widget _textRegister()
+  {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text(
+          '¿Aun no tienes cuenta?',
+          style: Theme.of(context).textTheme.body1
+        ),
+
+        SizedBox(width: 10),
+        FlatButton(
+            padding: EdgeInsets.all(0),
+            onPressed: () {
+              Navigator.pushNamed(context, SignUp().tag);
+            },
+            child: Text(
+              'Registrate!',
+              style: Theme.of(context).textTheme.subhead
+            )
+        )
+      ],
+    );
+  }
+
+
+  /*
+   * Texto para recuperar contraseña
+   * 
+   * @return [Widget]
+   */
+  Widget _textRecoverPassword()
+  {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        FlatButton(
+          
+          padding: EdgeInsets.all(0),
+          onPressed: () {
+            Navigator.pushNamed(context, RecoverPassword().tag);
+          },
+          child: Text(
+            'Recuperar contraseña',
+            style: Theme.of(context).textTheme.body1
+          )
+        )
+      ],
+    );
+  }
+
+
+  /*
+  * Contenido de la vista
+  *
+  * @return [Widget] 
+  */
+  Widget _buidlWidget() 
+  {
     return Container(
-        decoration: BoxDecoration(color: Theme.of(context).primaryColor),
         child: Center(
           child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 40),
+              padding: EdgeInsets.symmetric(horizontal: SizeConfig.blockSizeHorizontal * 9),
               child: Form(
                 key: formKey,
                 child: Column(
                   children: <Widget>[
                     Text('Respikaf', style: Theme.of(context).textTheme.title),
-                    SizedBox(height: 48),
+                    SizedBox(height: SizeConfig.blockSizeVertical * 10),
                     InputText(
-                        label: 'Correo',
-                        typeInput: TextInputType.emailAddress,
-                        controller: ctrlEmail),
-                    SizedBox(height: 22),
+                      label: 'Correo',
+                      typeInput: TextInputType.emailAddress,
+                      controller: ctrlEmail
+                    ),
+
+
+                    SizedBox(height: SizeConfig.blockSizeVertical * 3.5),
                     InputText(
                       controller: ctrlPassword,
                       label: 'Contraseña',
                       typeInput: TextInputType.text,
                       isPassword: true,
                     ),
-                    SizedBox(height: 50),
+
+                    
+                    SizedBox(height: SizeConfig.blockSizeVertical * 7),
                     RaisedButton(
                       elevation: 6,
                       onPressed: _validateAndSave,
-                      child: Text('Ingresar',
-                          style: Theme.of(context).textTheme.display1),
+                      child: Text(
+                        'Ingresar',
+                        style: Theme.of(context).textTheme.display1
+                      ),
                     ),
-                    SizedBox(height: 38),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text('¿Aun no tienes cuenta?',
-                            style: Theme.of(context).textTheme.body1),
-                        SizedBox(width: 10),
-                        FlatButton(
-                            padding: EdgeInsets.all(0),
-                            onPressed: () {
-                              Navigator.pushNamed(context, SignUp().tag);
-                            },
-                            child: Text('Registrate!',
-                                style: Theme.of(context).textTheme.subhead))
-                      ],
-                    )
+
+
+                    SizedBox(height: SizeConfig.blockSizeVertical * 5),
+                    _textRegister(),
+                    
+                    _textRecoverPassword(),
                   ],
                 ),
               )),
         ));
   }
 
+
+
+  /*
+  * Renderiza toda la vista
+  *
+  * @return [Widget] 
+  */
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) 
+  {
+    // Dimensiones estandar 
+    SizeConfig().init(context);
+
     return Scaffold(
         key: _scaffoldKey,
         body: ModalProgressHUD(
-            child: _buidlWidget(),
-            inAsyncCall: _isLoading,
-            opacity: 0.4,
-            color: Colors.black));
+          child: _buidlWidget(),
+          inAsyncCall: _isLoading,
+          opacity: 0.4,
+          color: Colors.black
+        )
+      );
   }
 }

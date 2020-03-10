@@ -80,6 +80,7 @@ class _SignUpState extends State<SignUp>
     return items;
   }
 
+
   /*
   * Definir el tipo de paciente
   *
@@ -236,7 +237,9 @@ class _SignUpState extends State<SignUp>
         _listTextErrors = [];
 
         _list.forEach((key, value) {
-          _listTextErrors.add(value[0]);
+          setState(() {
+            _listTextErrors.add(value[0]);
+          });
         });
 
       }
@@ -254,9 +257,9 @@ class _SignUpState extends State<SignUp>
   */
   Widget _showErrorsForm()
   {
-    return Flexible(
-      fit: FlexFit.loose,
-      child: ListView.builder(
+    return ListView.builder(
+      padding: EdgeInsets.all(0),
+      physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemCount: _listTextErrors.length,
         itemBuilder: (BuildContext context, int index)
@@ -272,24 +275,22 @@ class _SignUpState extends State<SignUp>
               )
             );
         },
-      )
-    );
+      );
   }
 
 
   /*
-  * Contenido de la app
+  * Contenido de la vista
   *
   * @return [Widget] 
   */
   Widget _buidlWidget(BuildContext context) 
   {
-    return Scaffold(
-      body: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
+    return Container(
+        // fit: StackFit.expand,
+        //children: <Widget>[
           
-          SingleChildScrollView(
+        child:  SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: 40, vertical: 28),
             child: Form(
               key: formKey,
@@ -339,13 +340,17 @@ class _SignUpState extends State<SignUp>
               ),
             )
           ),
-        ],
-      ),
+        // ],
     );
   }
 
 
 
+  /*
+  * Renderiza toda la vista
+  *
+  * @return [Widget] 
+  */
   @override
   Widget build(BuildContext context) 
   {
@@ -355,10 +360,11 @@ class _SignUpState extends State<SignUp>
     return Scaffold(
       key: _scaffoldKey,
       body: ModalProgressHUD(
-          child: _buidlWidget(context),
-          inAsyncCall: _isLoading,
-          opacity: 0.4,
-          color: Colors.black)
-      );
+        child: _buidlWidget(context),
+        inAsyncCall: _isLoading,
+        opacity: 0.4,
+        color: Colors.black
+      )
+    );
   }
 }
